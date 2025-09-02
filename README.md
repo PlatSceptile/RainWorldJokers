@@ -1,7 +1,7 @@
 # RainWorldJokers
 A Balatro mod made using Steamodded which adds several Jokers based on Rain World.
 
-Made by PlatSceptile. Help with ideas from some friends. 
+Made by PlatSceptile. Help with ideas from some friends. Rain World and related media by Videocult.
 Special thanks to the Steamodded discord for putting up with my stupid questions.
 
 # Jokers (as of version 0.1)
