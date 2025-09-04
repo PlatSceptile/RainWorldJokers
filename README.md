@@ -13,7 +13,7 @@ Special thanks to the Steamodded discord for putting up with my stupid questions
 |Seven Red Suns|Iterator|No| If played poker hand is a Two Pair, turns the lower two cards into Gold cards |
 |Chasing Winds|Iterator|No| Gain +10 Mult whenever a Spectral pack is opened |
 |Five Pebbles|Iterator|No| Whenever a hand is scored, turns a random scored card into Clubs suit (Excluding cards that are already Clubs) |
-|Grapple Worm|Iterator|No| After a hand scores, send a random scoring card back into your hand |
+|Grapple Worm|Creature|No| After a hand scores, send a random scoring card back into your hand |
 |Looks To The Moon|Iterator|No| Whenever a hand is scored, enchances a random scored card to Wild (Excluding cards that are already Wild) |
 |No Significant Harassment|Iterator|No| +16 Mult. Retriggers all other Iterator Jokers (Inconsistent. Will probably be updated at some point.) |
 |Daddy Long Legs|Rot|No| Gives Mult per card scored of clubs suit depending on the amount of clubs cards in the played hand |
