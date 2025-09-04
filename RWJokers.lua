@@ -5,17 +5,20 @@ SMODS.Atlas {
 	py = 95
 }
 
+--enabling needed optional features
+SMODS.current_mod.optional_features = {
+  retrigger_joker = true,
+}
 
 
 
-
--- 1 rot tree joker
+-- 1 mother long legs joker
 SMODS.Joker {
-  key = 'rottree',
+  key = 'mllegs',
   loc_txt = {
-      name = 'Rot Tree',
+      name = 'Mother Long Legs',
       text = {
-        "Gives {X:mult,C:white}XMult{} equal to",
+        "Gives {X:mult,C:white}XMult{} depending on",
         "the amount of {C:clubs{}Clubs{} cards",
         "in the played hand whenever",
         "a {C:clubs}Clubs{} card is scored"
@@ -109,7 +112,7 @@ SMODS.Joker {
         "{C:inactive}(Currently {}{X:mult,C:white} X#1# {}{C:inactive}){}"
       }
   },
-  config = { extra = { Xmult = 1 , Xmultmod = 0.5 }},
+  config = { extra = {Xmult = 1, Xmultmod = 0.5, iterator = true}},
   rarity = 3,
   atlas = 'RWJokers_Atlas',
   pos = { x = 0, y = 0 },
@@ -158,8 +161,9 @@ SMODS.Joker {
         "into a {C:attention}Gold{} card"
       }
   },
-  config = { extra = { type = 'Two Pair'}},
+  config = { extra = { type = 'Two Pair', iterator = true}},
   rarity = 2,
+  blueprint_compat = false,
   atlas = 'RWJokers_Atlas',
   pos = { x = 0, y = 0 },
   cost = 6,
@@ -180,9 +184,11 @@ SMODS.Joker {
       for _, scored_card in ipairs(context.scoring_hand) do
         if 
           scored_card:get_id() == lower_card and 
+          lower_card ~= 100 and
           not SMODS.has_enhancement(scored_card, 'm_gold') then
             SMODS.calculate_effect({message = 'Gold!', colour = G.C.MONEY}, card)
             scored_card:set_ability('m_gold',nil,true)
+            lower_card = 100
             G.E_MANAGER:add_event(Event({
               func = function()
                 scored_card:set_ability('m_gold',nil,true)
@@ -191,11 +197,14 @@ SMODS.Joker {
                 return true
               end
             }))
-        end 
-      end 
+        end
+      end
+      return true -- so it repeats with nsh
     end
   end
 }
+
+
 
 
 
@@ -210,7 +219,7 @@ SMODS.Joker {
         "{C:inactive}(Currently {}{C:mult}+#1#{}{C:inactive}){}"
       }
   },
-  config = { extra = { type = 'Spectral', mult = 0, multmod = 10}},
+  config = { extra = { type = 'Spectral', mult = 0, multmod = 10, iterator = true}},
   rarity = 2,
   atlas = 'RWJokers_Atlas',
   pos = { x = 0, y = 0 },
@@ -222,9 +231,10 @@ SMODS.Joker {
   calculate = function(self, card ,context)
     --activate if a booster is opened and check if spectral
     if context.open_booster then
-      if context.card.config.center.kind == card.ability.extra.type then
+      if context.card.config.center.kind == card.ability.extra.type and not context.blueprint then
         SMODS.calculate_effect({message = 'Upgrade!', colour = G.C.MULT}, card)
         card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.multmod
+        return true --for repetitions
       end
     end
     
@@ -248,13 +258,13 @@ SMODS.Joker {
       name = 'Five Pebbles',
       text = {
         "Whenever a hand is scored",
-        "turn a random card into",
+        "turns a random card into",
         "{C:clubs}#1#{} suit",
         "{C:inactive}Excluding cards that{}",
         "{C:inactive}are already #1#{}",
       }
   },
-  config = { extra = {suit = 'Clubs'}},
+  config = { extra = {suit = 'Clubs', iterator = true}},
   rarity = 2,
   atlas = 'RWJokers_Atlas',
   pos = { x = 0, y = 0 },
@@ -280,6 +290,9 @@ SMODS.Joker {
       
       if findcard ~= 0 then
         G.E_MANAGER:add_event(Event({
+          delay = 0.2,
+          trigger = 'before',
+          SMODS.calculate_effect({message = "Enhanced!", colour = G.C.BLUE}, card),
           func = function()
             SMODS.change_base(findcard, card.ability.extra.suit)
             findcard:juice_up()
@@ -287,14 +300,13 @@ SMODS.Joker {
             return true
           end
         }))
-        return {
-          message = "Rotting...",
-          colour = G.C.BLUE
-        }
       end 
+      return true
     end
   end
 }
+
+
 
 
 
@@ -311,6 +323,7 @@ SMODS.Joker {
   },
   config = { extra = {}},
   rarity = 2,
+  blueprint_compat = false,
   atlas = 'RWJokers_Atlas',
   pos = { x = 0, y = 0 },
   cost = 6,
@@ -320,22 +333,221 @@ SMODS.Joker {
     if context.after and context.cardarea then
       local grappled = pseudorandom_element(context.scoring_hand, 'grapple')
       G.E_MANAGER:add_event(Event({
+        -- say the shit
+        SMODS.calculate_effect({message = "Grappled!",colour = G.C.PERISHABLE}, card),
         func = function()
           SMODS.destroy_cards(grappled, nil, nil, true)
           local copy_card = copy_card(grappled, nil, nil, G.playing_card)
           copy_card:add_to_deck()
           table.insert(G.playing_cards, copy_card)
           G.hand:emplace(copy_card)
-          -- say the shit
-          SMODS.calculate_effect({message = "Grappled!",colour = G.C.PERISHABLE}, card)
           return true
         end
-      }))      
+      }))
+      return true      
     end
   end
   
 }
-  
+
+
+
+
+
+-- 8 lttm joker
+SMODS.Joker {
+  key = 'lttmoon',
+  loc_txt = {
+      name = 'Looks To The Moon',
+      text = {
+        "Whenever a hand is scored",
+        "enhances a random card to {C:attention}#1#{}",
+        "{C:inactive}Excluding cards that{}",
+        "{C:inactive}are already #1#{}",
+      }
+  },
+  config = { extra = {enhancement = 'Wild', iterator = true}},
+  rarity = 1,
+  atlas = 'RWJokers_Atlas',
+  pos = { x = 0, y = 0 },
+  cost = 5,
+  loc_vars = function (self, info_queue, card)
+    return {vars = {card.ability.extra.enhancement}}
+  end,
+
+  calculate = function (self, card, context)
+    if context.final_scoring_step then
+    
+      local notwild = {}
+      for i = 1, #context.scoring_hand do
+        if not SMODS.has_enhancement(context.scoring_hand[i],'m_wild') then 
+          table.insert(notwild,context.scoring_hand[i])
+        end
+      end
+
+      local findcard = 0
+      if #notwild ~= 0 then
+        findcard = pseudorandom_element(notwild, 'lttmoon')
+      end
+      
+      if findcard ~= 0 then
+        G.E_MANAGER:add_event(Event({
+          trigger = 'before',
+          delay = 0.2,
+          SMODS.calculate_effect({message = "Enhanced!"}, card),
+          func = function()
+            findcard:set_ability('m_wild')
+            findcard:juice_up()
+            play_sound('tarot2', 0.96 + math.random() * 0.08)
+            return true
+          end
+        }))
+      end 
+      return true
+    end
+  end
+}
+
+
+
+
+
+-- 9 no significant harassment joker
+SMODS.Joker {
+  key = 'nsharassment',
+  loc_txt = {
+      name = 'No Significant Harassment',
+      text = {
+        "{C:mult}+#1#{} Mult",
+        "Attempts to retrigger",
+        "all other {C:attention}Iterator Jokers{}",
+        "{C:inactive}INCONSISTENT{}"
+      }
+  },
+  config = { extra = {mult = 16} },
+  rarity = 1,
+  blueprint_compat = false,
+  atlas = 'RWJokers_Atlas',
+  pos = { x = 0, y = 0 },
+  cost = 4,
+  loc_vars = function (self, info_queue, card)
+    return {vars = {card.ability.extra.mult}}
+  end,
+
+  --retrigger iterator cards
+  calculate = function(self,card,context)
+    if context.retrigger_joker_check and context.other_card.ability.extra['iterator'] then
+      return {repetitions = 1}
+    end
+    if context.joker_main then
+      return {
+        mult = card.ability.extra.mult
+      }
+    end
+  end
+}
+
+
+
+
+
+-- 10 daddy long legs joker
+SMODS.Joker {
+  key = 'dllegs',
+  loc_txt = {
+      name = 'Daddy Long Legs',
+      text = {
+        "Gives {C:mult}Mult{} depending on",
+        "the amount of {C:clubs{}Clubs{} cards",
+        "in the played hand whenever",
+        "a {C:clubs}Clubs{} card is scored"
+      }
+  },
+  config = { extra = { mult = 0, multmod = 10 }},
+  rarity = 2,
+  atlas = 'RWJokers_Atlas',
+  pos = { x = 0, y = 0 },
+  cost = 7,
+
+  calculate = function(self,card,context)
+  -- count spades
+    if context.before then
+      local clubs = 0
+      for i = 1, #context.scoring_hand do
+        if context.scoring_hand[i]:is_suit('Clubs',true) then 
+          clubs = clubs + 1
+        end
+      end
+      card.ability.extra.mult = clubs * card.ability.extra.multmod
+    end 
+  -- mult per scoring
+    if context.individual and context.cardarea == G.play and context.other_card:is_suit("Clubs") then
+      return {
+        mult = card.ability.extra.mult
+      }
+    end 
+  -- reset mult to 0
+    if context.final_scoring_step then
+      card.ability.extra.mult = 0
+      return {
+        message = 'Rotting...',
+        colour = G.C.BLUE,
+        card = card
+      }
+    end
+  end
+}
+
+
+
+
+
+-- 10 daddy long legs joker
+SMODS.Joker {
+  key = 'bllegs',
+  loc_txt = {
+      name = 'Brother Long Legs',
+      text = {
+        "Gives {C:chips}Chips{} depending on",
+        "the amount of {C:clubs{}Clubs{} cards",
+        "in the played hand whenever",
+        "a {C:clubs}Clubs{} card is scored"
+      }
+  },
+  config = { extra = { chips = 0, chipsmod = 20 }},
+  rarity = 2,
+  atlas = 'RWJokers_Atlas',
+  pos = { x = 0, y = 0 },
+  cost = 7,
+
+  calculate = function(self,card,context)
+  -- count spades
+    if context.before then
+      local clubs = 0
+      for i = 1, #context.scoring_hand do
+        if context.scoring_hand[i]:is_suit('Clubs',true) then 
+          clubs = clubs + 1
+        end
+      end
+      card.ability.extra.chips = clubs * card.ability.extra.chipsmod
+    end 
+  -- mult per scoring
+    if context.individual and context.cardarea == G.play and context.other_card:is_suit("Clubs") then
+      return {
+        chips = card.ability.extra.chips
+      }
+    end 
+  -- reset mult to 0
+    if context.final_scoring_step then
+      card.ability.extra.chips = 0
+      return {
+        message = 'Rotting...',
+        colour = G.C.BLUE,
+        card = card
+      }
+    end
+  end
+}
 --hope it doesnt crash :)
       
 
