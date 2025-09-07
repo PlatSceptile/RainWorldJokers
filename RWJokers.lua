@@ -71,7 +71,7 @@ SMODS.Joker {
         "{C:inactive}(Currently {}{X:mult,C:white} X#1# {}{C:inactive}){}",
       }
   },
-  config = { extra = { Xmult = 1, Slugcat = true }},
+  config = { extra = { Xmult = 1, slugcat = true }},
   rarity = 3,
   atlas = 'RWJokers_Atlas',
   pos = { x = 1, y = 0 },
