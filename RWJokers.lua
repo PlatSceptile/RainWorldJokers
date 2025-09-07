@@ -1,3 +1,4 @@
+
 SMODS.Atlas {
 	key = "RWJokers_Atlas",
 	path = "RWJokers_Atlas.png",
@@ -9,7 +10,6 @@ SMODS.Atlas {
 SMODS.current_mod.optional_features = {
   retrigger_joker = true,
 }
-
 
 
 -- 1 mother long legs joker
@@ -24,7 +24,7 @@ SMODS.Joker {
         "a {C:clubs}Clubs{} card is scored"
       }
   },
-  config = { extra = { Xmult = 0 }},
+  config = { extra = { Xmult = 0, Rot = true }},
   rarity = 3,
   atlas = 'RWJokers_Atlas',
   pos = { x = 0, y = 0 },
@@ -35,18 +35,18 @@ SMODS.Joker {
     if context.before then
       local clubs = 0
       for i = 1, #context.scoring_hand do
-        if context.scoring_hand[i]:is_suit('Clubs',true) then 
+        if context.scoring_hand[i]:is_suit('Clubs',true) then
           clubs = clubs + 1
         end
       end
       card.ability.extra.Xmult = clubs
-    end 
+    end
   -- mult per scoring
     if context.individual and context.cardarea == G.play and context.other_card:is_suit("Clubs") then
       return {
         xmult = card.ability.extra.Xmult
       }
-    end 
+    end
   -- reset mult to 0
     if context.final_scoring_step then
       card.ability.extra.Xmult = 0
@@ -60,9 +60,6 @@ SMODS.Joker {
 }
 
 
-
-
-
 -- 2 rivulet joker
 SMODS.Joker {
   key = 'rivulet',
@@ -74,7 +71,7 @@ SMODS.Joker {
         "{C:inactive}(Currently {}{X:mult,C:white} X#1# {}{C:inactive}){}",
       }
   },
-  config = { extra = { Xmult = 1 }},
+  config = { extra = { Xmult = 1, Slugcat = true }},
   rarity = 3,
   atlas = 'RWJokers_Atlas',
   pos = { x = 1, y = 0 },
@@ -82,21 +79,18 @@ SMODS.Joker {
   loc_vars = function(self,info_queue,card)
     return {vars = {G.SETTINGS.GAMESPEED}}
   end,
-  
+
   calculate = function(self,card,context)
     -- set the XMult but stopping change if the joker area is in use
     if not context.joker_main then
       card.ability.extra.Xmult = G.SETTINGS.GAMESPEED
     else
       return {
-        xmult = card.ability.extra.Xmult 
+        xmult = card.ability.extra.Xmult
       }
     end
   end
 }
-
-
-
 
 
 -- 3 sliver of straw joker 
@@ -121,8 +115,8 @@ SMODS.Joker {
   -- checking how many aces there are for the description. will be repeated again later for the actual calcing.
     local ace_tally = 0
     if G.playing_cards then
-      for _, playing_card in ipairs(G.playing_cards) do 
-        if playing_card:get_id() == 14 then ace_tally = ace_tally + 1 end 
+      for _, playing_card in ipairs(G.playing_cards) do
+        if playing_card:get_id() == 14 then ace_tally = ace_tally + 1 end
       end
     end
     return {vars = {card.ability.extra.Xmultmod * ace_tally + 1, card.ability.extra.Xmultmod}}
@@ -133,8 +127,8 @@ SMODS.Joker {
     if context.joker_main then
       local ace_tally = 0
       if G.playing_cards then
-        for _, playing_card in ipairs(G.playing_cards) do 
-          if playing_card:get_id() == 14 then ace_tally = ace_tally + 1 end 
+        for _, playing_card in ipairs(G.playing_cards) do
+          if playing_card:get_id() == 14 then ace_tally = ace_tally + 1 end
         end
         card.ability.extra.Xmult = ace_tally * card.ability.extra.Xmultmod + 1
       end
@@ -144,9 +138,6 @@ SMODS.Joker {
     end
   end
 }
-
-
-
 
 
 -- 4 seven red suns joker
@@ -169,21 +160,21 @@ SMODS.Joker {
   cost = 6,
 
   calculate = function(self,card,context)
-    
+
     if context.before and next(context.poker_hands[card.ability.extra.type]) then
       local lower_card = 100
       -- finding the lower card first
       for _, scored_card in ipairs(context.scoring_hand) do
-        if 
-          scored_card:get_id() < lower_card and 
-          not SMODS.has_enhancement(scored_card, 'm_stone') then 
-            lower_card = scored_card:get_id() 
+        if
+          scored_card:get_id() < lower_card and
+          not SMODS.has_enhancement(scored_card, 'm_stone') then
+            lower_card = scored_card:get_id()
         end
       end
       -- setting the lower card to 
       for _, scored_card in ipairs(context.scoring_hand) do
-        if 
-          scored_card:get_id() == lower_card and 
+        if
+          scored_card:get_id() == lower_card and
           lower_card ~= 100 and
           not SMODS.has_enhancement(scored_card, 'm_gold') then
             SMODS.calculate_effect({message = 'Gold!', colour = G.C.MONEY}, card)
@@ -203,9 +194,6 @@ SMODS.Joker {
     end
   end
 }
-
-
-
 
 
 -- 5 chasing winds joker
@@ -237,18 +225,15 @@ SMODS.Joker {
         return true --for repetitions
       end
     end
-    
+
     --apply mult in main loop
-    if context.joker_main then 
+    if context.joker_main then
       return {
         mult = card.ability.extra.mult
       }
     end
   end
 }
-
-
-
 
 
 -- 6 five pebbles joker
@@ -275,10 +260,10 @@ SMODS.Joker {
 
   calculate = function (self, card, context)
     if context.final_scoring_step then
-    
+
       local notclubs = {}
       for i = 1, #context.scoring_hand do
-        if not context.scoring_hand[i]:is_suit('Clubs', true) then 
+        if not context.scoring_hand[i]:is_suit('Clubs', true) then
           table.insert(notclubs,context.scoring_hand[i])
         end
       end
@@ -287,7 +272,7 @@ SMODS.Joker {
       if #notclubs ~= 0 then
         findcard = pseudorandom_element(notclubs, 'fpebbles')
       end
-      
+
       if findcard ~= 0 then
         G.E_MANAGER:add_event(Event({
           delay = 0.2,
@@ -300,14 +285,11 @@ SMODS.Joker {
             return true
           end
         }))
-      end 
+      end
       return true
     end
   end
 }
-
-
-
 
 
 -- 7 grapple worm joker
@@ -321,7 +303,7 @@ SMODS.Joker {
         "back into your hand"
       }
   },
-  config = { extra = {}},
+  config = { extra = {Creature = true}},
   rarity = 2,
   blueprint_compat = false,
   atlas = 'RWJokers_Atlas',
@@ -344,14 +326,11 @@ SMODS.Joker {
           return true
         end
       }))
-      return true      
+      return true
     end
   end
-  
+
 }
-
-
-
 
 
 -- 8 lttm joker
@@ -377,10 +356,10 @@ SMODS.Joker {
 
   calculate = function (self, card, context)
     if context.final_scoring_step then
-    
+
       local notwild = {}
       for i = 1, #context.scoring_hand do
-        if not SMODS.has_enhancement(context.scoring_hand[i],'m_wild') then 
+        if not SMODS.has_enhancement(context.scoring_hand[i],'m_wild') then
           table.insert(notwild,context.scoring_hand[i])
         end
       end
@@ -389,7 +368,7 @@ SMODS.Joker {
       if #notwild ~= 0 then
         findcard = pseudorandom_element(notwild, 'lttmoon')
       end
-      
+
       if findcard ~= 0 then
         G.E_MANAGER:add_event(Event({
           trigger = 'before',
@@ -402,14 +381,11 @@ SMODS.Joker {
             return true
           end
         }))
-      end 
+      end
       return true
     end
   end
 }
-
-
-
 
 
 -- 9 no significant harassment joker
@@ -448,9 +424,6 @@ SMODS.Joker {
 }
 
 
-
-
-
 -- 10 daddy long legs joker
 SMODS.Joker {
   key = 'dllegs',
@@ -463,7 +436,7 @@ SMODS.Joker {
         "a {C:clubs}Clubs{} card is scored"
       }
   },
-  config = { extra = { mult = 0, multmod = 10 }},
+  config = { extra = { mult = 0, multmod = 10, Rot = true }},
   rarity = 2,
   atlas = 'RWJokers_Atlas',
   pos = { x = 0, y = 0 },
@@ -474,18 +447,18 @@ SMODS.Joker {
     if context.before then
       local clubs = 0
       for i = 1, #context.scoring_hand do
-        if context.scoring_hand[i]:is_suit('Clubs',true) then 
+        if context.scoring_hand[i]:is_suit('Clubs',true) then
           clubs = clubs + 1
         end
       end
       card.ability.extra.mult = clubs * card.ability.extra.multmod
-    end 
+    end
   -- mult per scoring
     if context.individual and context.cardarea == G.play and context.other_card:is_suit("Clubs") then
       return {
         mult = card.ability.extra.mult
       }
-    end 
+    end
   -- reset mult to 0
     if context.final_scoring_step then
       card.ability.extra.mult = 0
@@ -497,9 +470,6 @@ SMODS.Joker {
     end
   end
 }
-
-
-
 
 
 -- 10 daddy long legs joker
@@ -514,7 +484,7 @@ SMODS.Joker {
         "a {C:clubs}Clubs{} card is scored"
       }
   },
-  config = { extra = { chips = 0, chipsmod = 20 }},
+  config = { extra = { chips = 0, chipsmod = 20, Rot = true }},
   rarity = 2,
   atlas = 'RWJokers_Atlas',
   pos = { x = 0, y = 0 },
@@ -525,18 +495,18 @@ SMODS.Joker {
     if context.before then
       local clubs = 0
       for i = 1, #context.scoring_hand do
-        if context.scoring_hand[i]:is_suit('Clubs',true) then 
+        if context.scoring_hand[i]:is_suit('Clubs',true) then
           clubs = clubs + 1
         end
       end
       card.ability.extra.chips = clubs * card.ability.extra.chipsmod
-    end 
+    end
   -- mult per scoring
     if context.individual and context.cardarea == G.play and context.other_card:is_suit("Clubs") then
       return {
         chips = card.ability.extra.chips
       }
-    end 
+    end
   -- reset mult to 0
     if context.final_scoring_step then
       card.ability.extra.chips = 0
@@ -549,5 +519,5 @@ SMODS.Joker {
   end
 }
 --hope it doesnt crash :)
-      
+
 
