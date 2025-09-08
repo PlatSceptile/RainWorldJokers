@@ -4,7 +4,7 @@ A Balatro mod made using Steamodded which adds several Jokers based on Rain Worl
 Made by PlatSceptile. Help with ideas from some friends. Rain World and related media by Videocult.
 Special thanks to the Steamodded discord for putting up with my stupid questions.
 
-# Jokers (As of Version 0.1.1)
+# Jokers (As of Version 0.1.2)
 | Name | Set | Art | Ability
 | ---  | --- | --- | ---
 |Mother Long Legs|Rot|Yes| Gives XMult per card scored of clubs suit depending on the amount of clubs cards in the played hand |
