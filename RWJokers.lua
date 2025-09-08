@@ -472,7 +472,7 @@ SMODS.Joker {
 }
 
 
--- 10 daddy long legs joker
+-- 11 brother long legs joker
 SMODS.Joker {
   key = 'bllegs',
   loc_txt = {
@@ -518,6 +518,81 @@ SMODS.Joker {
     end
   end
 }
+
+
+-- 12 saint joker
+SMODS.Joker {
+  key = 'saint',
+  loc_txt = {
+      name = 'Saint',
+      text = {
+        "After {C:attention}#1#{} hands, destroys",
+        "the Joker to the right and",
+        "gains XMult equal to its",
+        "sell value",
+        "{C:inactive}(Currently {}{X:mult,C:white} X#3# {}{C:inactive}){}",
+        "{C:inactive}(#2# Hand(s) remaining){}",
+      }
+  },
+  config = { extra = {hands = 10, remaining = 10, Xmult = 1, slugcat = true}},
+  rarity = 3,
+  atlas = 'RWJokers_Atlas',
+  pos = { x = 0, y = 0 },
+  cost = 8,
+  loc_vars = function(self,info_queue,card)
+    return {vars = {card.ability.extra.hands, card.ability.extra.remaining, card.ability.extra.Xmult}}
+  end,
+
+  calculate = function(self,card,context)
+
+    
+    if context.joker_main then
+
+      --check hands. if 0 remaining, find and destroy right joker, gain xmult.
+      if card.ability.extra.remaining <= 1 and not context.blueprint then
+
+        card.ability.extra.remaining = card.ability.extra.hands
+        local my_pos = nil
+        for i = 1, #G.jokers.cards do
+          if G.jokers.cards[i] == card then
+            my_pos = i
+            break
+          end
+        end
+        
+        local right_joker = G.jokers.cards[my_pos + 1]
+        if my_pos and right_joker and 
+          not SMODS.is_eternal(right_joker, card) and 
+          not right_joker.getting_sliced then
+            right_joker.getting_sliced = true
+            G.E_MANAGER:add_event(Event({
+              SMODS.calculate_effect({message = "Ascended!", colour = G.C.G}, card),
+              func = function()
+                G.GAME.joker_buffer = 0
+                card.ability.extra.Xmult = card.ability.extra.Xmult + right_joker.sell_cost
+                card:juice_up(0.8, 0.8)
+                right_joker:start_dissolve({HEX("e3c254")},nil,0.8)
+                play_sound('ascend', 0.96 + math.random() * 0.08)                              --replace with ascension sound 
+                return true
+              end
+            }))
+        end
+      --count down hands and do the dna ready thingy at 1 hand remaining
+      elseif not context.blueprint then
+        card.ability.extra.remaining = card.ability.extra.remaining - 1
+        if card.ability.extra.remaining == 1 then
+          local eval = function(card) return card.ability.extra.remaining == 1 and not G.RESET_JIGGLES end
+          juice_card_until(card, eval, true)
+        end
+      end
+
+      return {
+        xmult = card.ability.extra.Xmult
+      }
+    end
+  end
+}
+
 --hope it doesnt crash :)
 
 
