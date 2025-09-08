@@ -19,7 +19,7 @@ SMODS.Joker {
   },
   config = { extra = { Xmult = 0, Rot = true }},
   rarity = 3,
-  atlas = 'RWJokers_Atlas',
+  atlas = 'RWJokers_Rot',
   pos = { x = 0, y = 0 },
   cost = 7,
 
@@ -66,7 +66,7 @@ SMODS.Joker {
   },
   config = { extra = { Xmult = 1, slugcat = true }},
   rarity = 3,
-  atlas = 'RWJokers_Atlas',
+  atlas = 'RWJokers_Slugcats',
   pos = { x = 1, y = 0 },
   cost = 7,
   loc_vars = function(self,info_queue,card)
@@ -101,7 +101,7 @@ SMODS.Joker {
   },
   config = { extra = {Xmult = 1, Xmultmod = 0.5, iterator = true}},
   rarity = 3,
-  atlas = 'RWJokers_Atlas',
+  atlas = 'RWJokers_Slugcats',
   pos = { x = 0, y = 0 },
   cost = 7,
   loc_vars = function(self,info_queue,card)
@@ -148,7 +148,7 @@ SMODS.Joker {
   config = { extra = { type = 'Two Pair', iterator = true}},
   rarity = 2,
   blueprint_compat = false,
-  atlas = 'RWJokers_Atlas',
+  atlas = 'RWJokers_Slugcats',
   pos = { x = 0, y = 0 },
   cost = 6,
 
@@ -202,7 +202,7 @@ SMODS.Joker {
   },
   config = { extra = { type = 'Spectral', mult = 0, multmod = 10, iterator = true}},
   rarity = 2,
-  atlas = 'RWJokers_Atlas',
+  atlas = 'RWJokers_Slugcats',
   pos = { x = 0, y = 0 },
   cost = 5,
   loc_vars = function(self, info_queue, card)
@@ -244,7 +244,7 @@ SMODS.Joker {
   },
   config = { extra = {suit = 'Clubs', iterator = true}},
   rarity = 2,
-  atlas = 'RWJokers_Atlas',
+  atlas = 'RWJokers_Slugcats',
   pos = { x = 0, y = 0 },
   cost = 6,
   loc_vars = function (self, info_queue, card)
@@ -299,7 +299,7 @@ SMODS.Joker {
   config = { extra = {Creature = true}},
   rarity = 2,
   blueprint_compat = false,
-  atlas = 'RWJokers_Atlas',
+  atlas = 'RWJokers_Slugcats',
   pos = { x = 0, y = 0 },
   cost = 6,
 
@@ -340,7 +340,7 @@ SMODS.Joker {
   },
   config = { extra = {enhancement = 'Wild', iterator = true}},
   rarity = 1,
-  atlas = 'RWJokers_Atlas',
+  atlas = 'RWJokers_Slugcats',
   pos = { x = 0, y = 0 },
   cost = 5,
   loc_vars = function (self, info_queue, card)
@@ -396,7 +396,7 @@ SMODS.Joker {
   config = { extra = {mult = 16} },
   rarity = 1,
   blueprint_compat = false,
-  atlas = 'RWJokers_Atlas',
+  atlas = 'RWJokers_Slugcats',
   pos = { x = 0, y = 0 },
   cost = 4,
   loc_vars = function (self, info_queue, card)
@@ -431,7 +431,7 @@ SMODS.Joker {
   },
   config = { extra = { mult = 0, multmod = 10, Rot = true }},
   rarity = 2,
-  atlas = 'RWJokers_Atlas',
+  atlas = 'RWJokers_Slugcats',
   pos = { x = 0, y = 0 },
   cost = 7,
 
@@ -479,7 +479,7 @@ SMODS.Joker {
   },
   config = { extra = { chips = 0, chipsmod = 20, Rot = true }},
   rarity = 2,
-  atlas = 'RWJokers_Atlas',
+  atlas = 'RWJokers_Slugcats',
   pos = { x = 0, y = 0 },
   cost = 7,
 
@@ -529,8 +529,8 @@ SMODS.Joker {
   },
   config = {extra = {hands = 10, remaining = 10, Xmult = 1, slugcat = true}},
   rarity = 3,
-  atlas = 'RWJokers_Atlas',
-  pos = { x = 0, y = 0 },
+  atlas = 'RWJokers_Slugcats',
+  pos = { x = 2, y = 0 },
   cost = 8,
   loc_vars = function(self,info_queue,card)
     return {vars = {card.ability.extra.hands, card.ability.extra.remaining, card.ability.extra.Xmult}}
