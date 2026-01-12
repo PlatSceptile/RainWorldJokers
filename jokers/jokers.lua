@@ -1,7 +1,7 @@
 
 --enabling needed optional features
 SMODS.current_mod.optional_features = {
-  retrigger_joker = true,
+  pass
 }
 
 
@@ -126,7 +126,7 @@ SMODS.Joker {
         card.ability.extra.Xmult = ace_tally * card.ability.extra.Xmultmod + 1
       end
       return {
-        xmult = card.ability.extra.Xmult
+        xmult = card.ability.extra.Xmult * (next(SMODS.find_card('j_rwjkrs_nsharassment')) and 2 * #SMODS.find_card('j_rwjkrs_nsharassment') or 1)
       }
     end
   end
@@ -214,7 +214,7 @@ SMODS.Joker {
     if context.open_booster then
       if context.card.config.center.kind == card.ability.extra.type and not context.blueprint then
         SMODS.calculate_effect({message = 'Upgrade!', colour = G.C.MULT}, card)
-        card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.multmod
+        card.ability.extra.mult = card.ability.extra.mult + (card.ability.extra.multmod * (next(SMODS.find_card('j_rwjkrs_nsharassment')) and 2 * #SMODS.find_card('j_rwjkrs_nsharassment') or 1))
         return true --for repetitions
       end
     end
@@ -222,7 +222,7 @@ SMODS.Joker {
     --apply mult in main loop
     if context.joker_main then
       return {
-        mult = card.ability.extra.mult
+        mult = card.ability.extra.mult * (next(SMODS.find_card('j_rwjkrs_nsharassment')) and 2 * #SMODS.find_card('j_rwjkrs_nsharassment') or 1)
       }
     end
   end
@@ -254,32 +254,39 @@ SMODS.Joker {
   calculate = function (self, card, context)
     if context.final_scoring_step then
 
-      local notclubs = {}
-      for i = 1, #context.scoring_hand do
-        if not context.scoring_hand[i]:is_suit('Clubs', true) then
-          table.insert(notclubs,context.scoring_hand[i])
+       local notclubs = {}
+       for i = 1, #context.scoring_hand do
+         if not context.scoring_hand[i]:is_suit('Clubs', true) then
+           table.insert(notclubs,context.scoring_hand[i])
+         end
+       end
+
+      for x = 1, (next(SMODS.find_card('j_rwjkrs_nsharassment')) and 2 * #SMODS.find_card('j_rwjkrs_nsharassment') or 1) do
+        local findcard = 0
+        if #notclubs ~= 0 then
+          findcard = pseudorandom_element(notclubs, 'fpebbles')
+          for y = 1, #notclubs do
+            if notclubs[y] == findcard then
+              table.remove(notclubs, y)
+              break
+            end
+          end
+        end
+
+        if findcard ~= 0 then
+          G.E_MANAGER:add_event(Event({
+            delay = 0.2,
+            trigger = 'before',
+            SMODS.calculate_effect({message = "Enhanced!", colour = G.C.BLUE}, card),
+            func = function()
+              SMODS.change_base(findcard, card.ability.extra.suit)
+              findcard:juice_up()
+              play_sound('tarot2', 0.96 + math.random() * 0.08)
+              return true
+            end
+          }))
         end
       end
-
-      local findcard = 0
-      if #notclubs ~= 0 then
-        findcard = pseudorandom_element(notclubs, 'fpebbles')
-      end
-
-      if findcard ~= 0 then
-        G.E_MANAGER:add_event(Event({
-          delay = 0.2,
-          trigger = 'before',
-          SMODS.calculate_effect({message = "Enhanced!", colour = G.C.BLUE}, card),
-          func = function()
-            SMODS.change_base(findcard, card.ability.extra.suit)
-            findcard:juice_up()
-            play_sound('tarot2', 0.96 + math.random() * 0.08)
-            return true
-          end
-        }))
-      end
-      return true
     end
   end
 }
@@ -356,26 +363,32 @@ SMODS.Joker {
           table.insert(notwild,context.scoring_hand[i])
         end
       end
-
-      local findcard = 0
-      if #notwild ~= 0 then
-        findcard = pseudorandom_element(notwild, 'lttmoon')
-      end
-
-      if findcard ~= 0 then
-        G.E_MANAGER:add_event(Event({
-          trigger = 'before',
-          delay = 0.2,
-          SMODS.calculate_effect({message = "Enhanced!"}, card),
-          func = function()
-            findcard:set_ability('m_wild')
-            findcard:juice_up()
-            play_sound('tarot2', 0.96 + math.random() * 0.08)
-            return true
+      for x = 1, (next(SMODS.find_card('j_rwjkrs_nsharassment')) and 2 * #SMODS.find_card('j_rwjkrs_nsharassment') or 1) do
+        local findcard = 0
+        if #notwild ~= 0 then
+          findcard = pseudorandom_element(notwild, 'lttmoon')
+          for y = 1, #notwild do
+              if notwild[y] == findcard then
+                table.remove(notwild, y)
+                break
+              end
           end
-        }))
+        end
+
+        if findcard ~= 0 then
+          G.E_MANAGER:add_event(Event({
+            trigger = 'before',
+            delay = 0.2,
+            SMODS.calculate_effect({message = "Enhanced!"}, card),
+            func = function()
+              findcard:set_ability('m_wild')
+              findcard:juice_up()
+              play_sound('tarot2', 0.96 + math.random() * 0.08)
+              return true
+            end
+          }))
+        end
       end
-      return true
     end
   end
 }
@@ -388,9 +401,8 @@ SMODS.Joker {
       name = 'No Significant Harassment',
       text = {
         "{C:mult}+#1#{} Mult",
-        "Attempts to retrigger",
-        "all other {C:attention}Iterator Jokers{}",
-        "{C:inactive}INCONSISTENT{}"
+        "Doubles the effect of",
+        "{C:attention}Iterator{} Jokers"
       }
   },
   config = { extra = {mult = 16} },
@@ -405,9 +417,6 @@ SMODS.Joker {
 
   --retrigger iterator cards
   calculate = function(self,card,context)
-    if context.retrigger_joker_check and context.other_card.ability.extra['iterator'] then
-      return {repetitions = 1}
-    end
     if context.joker_main then
       return {
         mult = card.ability.extra.mult
@@ -514,7 +523,7 @@ SMODS.Joker {
 
 
 -- 12 saint joker
-SMODS.Joker {
+SMODS.Joker {   
   key = 'saint',
   loc_txt = {
       name = 'Saint',
@@ -586,6 +595,119 @@ SMODS.Joker {
   end
 }
 
+
+-- 13 hunter joker
+SMODS.Joker {
+  key = 'hunter',
+  loc_txt = {
+      name = 'Hunter',
+      text = {
+        "{C:chips}+#1#{} Chips",
+        "{C:chips}-#2#{} Chips per hand",
+        "At {C:chips}0{} Chips {C:attention}destroys{} itself",
+        "{C:attention}and..?{}",
+      }
+  },
+  config = { extra = { chips = 190, chipsmod = 10, Slugcat = true }},
+  rarity = 2,
+  atlas = 'RWJokers_Slugcats',
+  pos = { x = 1, y = 0 },
+  cost = 7,
+  loc_vars = function(self,info_queue,card)
+    return {vars = {card.ability.extra.chips, card.ability.extra.chipsmod}}
+  end,
+
+  calculate = function(self,card,context)
+
+    if context.joker_main then
+      -- add chips
+      return {
+        chips = card.ability.extra.chips
+      }
+    end
+
+    if context.after and not context.blueprint then
+      --decrease chips
+      card.ability.extra.chips = card.ability.extra.chips - card.ability.extra.chipsmod
+      
+      --delete joker at 0 chips 
+      if card.ability.extra.chips == 0 then
+        G.E_MANAGER:add_event(Event({
+          func = function ()
+            card:set_ability('j_rwjkrs_hllegs')
+            return true
+          end
+        }))
+        SMODS.calculate_effect({message = 'Rotting...', colour = G.C.BLUE}, card)
+      else
+        return {
+          message = localize {type = 'variable', key = 'a_chips_minus', vars = {card.ability.extra.chipsmod}},
+          colour = G.C.CHIPS
+        }
+      end
+    end
+  end
+}
+
+
+-- 14 hll joker
+SMODS.Joker {
+  key = 'hllegs',
+  loc_txt = {
+      name = 'Hunter Long Legs',
+      text = {
+        "{X:mult,C:white} x#1# {} Mult",
+        "Loses {X:mult,C:white} x#2# {} Mult per",
+        "hand played. Resets",
+        "on round end."
+      }
+  },
+  config = { extra = { xmult = 3, xmultbase = 3, xmultmod = 0.5, just_created = true }},
+  rarity = 3,
+  atlas = 'RWJokers_Slugcats',
+  pos = { x = 0, y = 0 },
+  cost = 7,
+  loc_vars = function(self,info_queue,card)
+    return {vars = {card.ability.extra.xmult, card.ability.extra.xmultmod}}
+  end,
+
+  in_pool = function(self, args)
+    return false
+  end,
+
+  calculate = function(self,card,context)
+    if context.joker_main then
+      -- xmult
+      return {
+        xmult = card.ability.extra.xmult
+      }
+    end
+
+    if context.after and not context.blueprint and not card.ability.extra.just_created then
+      --decrease xmult
+      if card.ability.extra.xmult > 0.5 then
+        card.ability.extra.xmult = card.ability.extra.xmult - card.ability.extra.xmultmod
+        return {
+          message = "Rotting...",
+          colour = G.C.BLUE,
+        }
+      end
+    elseif card.ability.extra.just_created then
+      card.ability.extra.just_created = false
+    end
+
+    if context.end_of_round and 
+      context.game_over == false and 
+      context.main_eval and 
+      not context.blueprint then
+        card.ability.extra.xmult = card.ability.extra.xmultbase
+        return {
+          message = 'Reset!',
+          colour = G.C.MULT,
+        }
+    end
+  end
+}
 --hope it doesnt crash :)
 
 
